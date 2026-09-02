@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Nunito', 'Outfit', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #ffffff;
+    color: #18181b;
+  }
+}
+
+.font-rounded {
+  font-family: 'Nunito', 'Outfit', sans-serif;
+}
+
+.font-display {
+  font-family: 'Outfit', 'Nunito', sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Minimalist Smooth Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f4f4f5;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa;
+}
+
+/* Liquid Glass Design System */
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 
+    0 12px 35px -5px rgba(0, 0, 0, 0.04),
+    0 4px 12px -2px rgba(0, 0, 0, 0.02),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.03);
+}
+
+.liquid-glass-subtle {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 
+    0 8px 24px -4px rgba(0, 0, 0, 0.03),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.liquid-glass-dark {
+  background: rgba(24, 24, 27, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    0 14px 40px -6px rgba(0, 0, 0, 0.25),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.35);
+}
+
+.liquid-glass-nav {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    0 20px 50px -10px rgba(0, 0, 0, 0.08),
+    0 8px 20px -4px rgba(0, 0, 0, 0.04),
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+.liquid-pill-active {
+  background: #18181b;
+  color: #ffffff;
+  box-shadow: 
+    0 4px 14px -2px rgba(24, 24, 27, 0.35),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Subtle background ambient mesh glow */
+.ambient-mesh {
+  background-image: 
+    radial-gradient(at 15% 15%, rgba(224, 231, 255, 0.55) 0px, transparent 45%),
+    radial-gradient(at 85% 20%, rgba(254, 243, 199, 0.6) 0px, transparent 40%),
+    radial-gradient(at 50% 85%, rgba(243, 232, 255, 0.5) 0px, transparent 45%),
+    radial-gradient(at 80% 85%, rgba(220, 252, 231, 0.45) 0px, transparent 40%);
+}
+
+/* Smooth Timer Progress Ring */
+.timer-progress-ring {
+  transition: stroke-dashoffset 0.85s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s ease;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+/* Rounded Cards */
+.rounded-card {
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 1.5rem;
+}
+
+.rounded-card-subtle {
+  background: #fafafa;
+  border: 1px solid #f4f4f5;
+  border-radius: 1.25rem;
+}
+
+/* Minimal Range Input */
+input[type=range] {
+  accent-color: #18181b;
+}
+

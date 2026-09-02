@@ -1,0 +1,6 @@
+{
+  "name": "PomoStudy: Student Focus & Pomodoro Planner",
+  "description": "The ultimate Pomodoro study timer and task planner crafted for students. Features evolving study companions (Plant, Bird, Butterfly), assignment checklists, ambient soundscapes, and comprehensive academic analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
