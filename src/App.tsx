@@ -25,6 +25,7 @@ import { SettingsView } from './components/SettingsView';
 import { ZenMode } from './components/ZenMode';
 import { TaskModal } from './components/TaskModal';
 import { OnboardingFlow } from './components/OnboardingFlow';
+import { TourGuideModal } from './components/TourGuideModal';
 
 export const App: React.FC = () => {
   // --- Navigation Tab State ---
@@ -38,10 +39,15 @@ export const App: React.FC = () => {
   const [streak, setStreak] = useState<StreakData>(() => StorageService.getStreak());
   const [poki, setPoki] = useState<PokiState>(() => StorageService.getPoki());
 
-  // --- Onboarding Flow Control ---
+  // --- Onboarding & Tour Guide Flow Control ---
   const [isOnboardingActive, setIsOnboardingActive] = useState<boolean>(() => {
     const p = StorageService.getProfile();
     return !p.hasCompletedOnboarding;
+  });
+
+  const [isTourOpen, setIsTourOpen] = useState<boolean>(() => {
+    const p = StorageService.getProfile();
+    return p.hasCompletedOnboarding && !StorageService.hasSeenTour();
   });
 
   // --- Timer States ---
@@ -441,6 +447,9 @@ export const App: React.FC = () => {
     StorageService.saveSettings(newSettings);
     updateTimerForMode('focus', newSettings);
     setIsOnboardingActive(false);
+    if (!StorageService.hasSeenTour()) {
+      setIsTourOpen(true);
+    }
   };
 
   // If user has not completed onboarding, render the full-screen onboarding experience
@@ -458,7 +467,7 @@ export const App: React.FC = () => {
   const pendingTasksCount = tasks.filter((t) => !t.isCompleted).length;
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 flex flex-col font-sans selection:bg-zinc-950 selection:text-white relative">
+    <div className="min-h-screen bg-slate-50/70 ambient-mesh text-zinc-900 flex flex-col font-sans selection:bg-purple-900 selection:text-white relative">
       {/* Header with Liquid Glass & Tab Actions */}
       <Header
         profile={profile}
@@ -469,13 +478,14 @@ export const App: React.FC = () => {
         onSelectTab={(tab) => setCurrentTab(tab)}
         onToggleMute={() => setSoundMuted(!soundMuted)}
         onOpenZen={() => setIsZenOpen(true)}
+        onOpenTour={() => setIsTourOpen(true)}
       />
 
       {/* Main Container */}
-      <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col">
+      <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col pb-24">
         {/* 1. TIMER TAB */}
         {currentTab === 'timer' && (
-          <div className="space-y-4 animate-in fade-in duration-200">
+          <div className="space-y-3 sm:space-y-4 animate-in fade-in duration-200">
             {/* Timer Section */}
             <TimerSection
               mode={mode}
@@ -499,6 +509,7 @@ export const App: React.FC = () => {
               onClearActiveTask={() => handleSetActiveTask(activeTaskId || '')}
               onToggleCompleteTask={handleToggleCompleteTask}
               onIncrementPomodoro={handleIncrementPomodoro}
+              onOpenTasks={() => setCurrentTab('tasks')}
             />
 
             {/* Ambient Web Audio Soundscape */}
@@ -568,6 +579,7 @@ export const App: React.FC = () => {
               onSaveProfile={handleSaveProfile}
               onResetAllData={handleResetAllData}
               onReopenOnboarding={() => setIsOnboardingActive(true)}
+              onOpenTour={() => setIsTourOpen(true)}
             />
           </div>
         )}
@@ -608,6 +620,17 @@ export const App: React.FC = () => {
           setTaskToEdit(null);
         }}
         onSaveTask={handleSaveDetailedTask}
+      />
+
+      {/* 3. Interactive Student Tour Guide Modal */}
+      <TourGuideModal
+        isOpen={isTourOpen}
+        onClose={() => {
+          setIsTourOpen(false);
+          StorageService.setSeenTour(true);
+        }}
+        onNavigateTab={(tab) => setCurrentTab(tab)}
+        soundMuted={soundMuted}
       />
     </div>
   );

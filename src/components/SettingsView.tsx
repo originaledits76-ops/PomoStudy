@@ -25,6 +25,7 @@ interface SettingsViewProps {
   onSaveProfile: (profile: UserProfile) => void;
   onResetAllData: () => void;
   onReopenOnboarding?: () => void;
+  onOpenTour?: () => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
@@ -35,6 +36,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onSaveProfile,
   onResetAllData,
   onReopenOnboarding,
+  onOpenTour,
 }) => {
   const [localSettings, setLocalSettings] = useState<AppSettings>({ ...settings });
   const [localProfile, setLocalProfile] = useState<UserProfile>({ ...profile });
@@ -471,6 +473,50 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 <span>Import Backup File</span>
                 <input type="file" accept=".json" onChange={handleImportBackup} className="hidden" />
               </label>
+            </div>
+
+            {/* Tour & Onboarding Section */}
+            <div className="pt-6 border-t border-purple-100/80 space-y-3">
+              <h4 className="text-xs font-extrabold text-zinc-900 font-display">Guides & Setup</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {onOpenTour && (
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-50/70 to-rose-50/50 border border-purple-200/60 flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-bold text-purple-950 font-rounded">Interactive Tour Guide</p>
+                      <p className="text-[11px] text-purple-700 font-rounded">Replay the 5-step walkthrough</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!soundMuted) sound.playClick();
+                        onOpenTour();
+                      }}
+                      className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold font-rounded transition-all active:scale-95 shadow-xs"
+                    >
+                      Start Tour
+                    </button>
+                  </div>
+                )}
+
+                {onReopenOnboarding && (
+                  <div className="p-4 rounded-2xl bg-white/70 border border-zinc-200/80 flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-bold text-zinc-900 font-rounded">Setup Wizard</p>
+                      <p className="text-[11px] text-zinc-500 font-rounded">Redo companion & profile onboarding</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!soundMuted) sound.playClick();
+                        onReopenOnboarding();
+                      }}
+                      className="px-3.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold font-rounded transition-all active:scale-95 shadow-xs"
+                    >
+                      Restart Wizard
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Factory Reset */}

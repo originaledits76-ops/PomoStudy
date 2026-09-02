@@ -12,7 +12,15 @@ import {
   Sparkles,
   TrendingUp,
   Download,
+  PieChart as PieChartIcon,
 } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+} from 'recharts';
 import { DetailedAnalytics, SessionLog, UserProfile } from '../types';
 import { StorageService } from '../utils/storage';
 import { sound } from '../utils/soundEngine';
@@ -22,6 +30,17 @@ interface AnalyticsViewProps {
   soundMuted: boolean;
   onRefreshData: () => void;
 }
+
+// Sophisticated monochrome/slate palette for donut chart slices
+const DONUT_PALETTE = [
+  '#18181b', // zinc-900
+  '#3f3f46', // zinc-700
+  '#71717a', // zinc-500
+  '#a1a1aa', // zinc-400
+  '#52525b', // zinc-600
+  '#27272a', // zinc-800
+  '#d4d4d8', // zinc-300
+];
 
 export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   profile,
@@ -342,38 +361,137 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
       {/* TAB 2: SUBJECTS & HOURLY HEATMAP */}
       {activeTab === 'breakdown' && (
         <div className="space-y-6">
-          {/* Subject Distribution */}
-          <div className="liquid-glass rounded-3xl p-6 sm:p-8 space-y-4">
-            <h3 className="text-base font-extrabold text-zinc-900 font-display">
-              Subject & Category Allocation
-            </h3>
+          {/* Subject Distribution & Donut Breakdown */}
+          <div className="liquid-glass rounded-3xl p-6 sm:p-8 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-200/80 pb-4">
+              <div>
+                <h3 className="text-base font-extrabold text-zinc-900 font-display flex items-center gap-2">
+                  <PieChartIcon className="w-4 h-4 text-zinc-900" />
+                  <span>Subject Time Breakdown</span>
+                </h3>
+                <p className="text-xs text-zinc-600 font-rounded mt-0.5">
+                  Visual distribution of your focus hours across academic subjects
+                </p>
+              </div>
+
+              {analytics.subjectDistribution.length > 0 && (
+                <div className="flex items-center gap-2 text-xs font-mono font-bold text-zinc-700 bg-zinc-100 px-3 py-1.5 rounded-full self-start sm:self-auto border border-zinc-200/60">
+                  <span>Total: {analytics.totalFocusMinutes} mins</span>
+                  <span>•</span>
+                  <span>{analytics.subjectDistribution.length} Subjects</span>
+                </div>
+              )}
+            </div>
 
             {analytics.subjectDistribution.length === 0 ? (
-              <p className="text-xs text-zinc-500 font-rounded py-4 text-center">
-                No session logs recorded in this timeframe yet.
-              </p>
+              <div className="py-12 text-center text-zinc-500 text-xs font-rounded space-y-2">
+                <PieChartIcon className="w-8 h-8 mx-auto text-zinc-300 stroke-[1.5]" />
+                <p>No study session logs recorded in this timeframe yet.</p>
+                <p className="text-[11px] text-zinc-400">Complete a Pomodoro session tagged with a subject to view your donut breakdown.</p>
+              </div>
             ) : (
-              <div className="space-y-3">
-                {analytics.subjectDistribution.map((sub) => (
-                  <div key={sub.subject} className="space-y-1.5">
-                    <div className="flex justify-between text-xs font-bold font-rounded">
-                      <span className="flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: sub.color }} />
-                        <span className="text-zinc-900">{sub.subject}</span>
-                      </span>
-                      <span className="font-mono text-zinc-500">
-                        {sub.minutes} mins ({sub.percentage}%) • {sub.sessions} sessions
-                      </span>
-                    </div>
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                {/* Donut Chart Canvas with Center Metric */}
+                <div className="lg:col-span-6 flex flex-col items-center justify-center relative min-h-[260px]">
+                  <div className="w-full h-64 relative flex items-center justify-center">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Tooltip
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              const data = payload[0].payload;
+                              return (
+                                <div className="bg-zinc-950 text-white p-2.5 rounded-xl shadow-xl text-xs font-rounded border border-zinc-800">
+                                  <div className="flex items-center gap-1.5 font-bold mb-1">
+                                    <span
+                                      className="w-2.5 h-2.5 rounded-full"
+                                      style={{ backgroundColor: data.color || DONUT_PALETTE[0] }}
+                                    />
+                                    <span>{data.subject}</span>
+                                  </div>
+                                  <div className="text-zinc-300 font-mono text-[11px] space-y-0.5">
+                                    <div>Time: <strong className="text-white">{data.minutes} mins</strong> ({data.percentage}%)</div>
+                                    <div>Sessions: <strong className="text-white">{data.sessions}</strong></div>
+                                  </div>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Pie
+                          data={analytics.subjectDistribution}
+                          dataKey="minutes"
+                          nameKey="subject"
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={68}
+                          outerRadius={98}
+                          paddingAngle={3}
+                          stroke="#ffffff"
+                          strokeWidth={2}
+                          animationDuration={800}
+                        >
+                          {analytics.subjectDistribution.map((entry, index) => (
+                            <Cell
+                              key={`cell-${entry.subject}`}
+                              fill={entry.color || DONUT_PALETTE[index % DONUT_PALETTE.length]}
+                            />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
 
-                    <div className="w-full h-2.5 bg-zinc-100 rounded-full overflow-hidden border border-zinc-200/80">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{ width: `${sub.percentage}%`, backgroundColor: sub.color }}
-                      />
+                    {/* Donut Inner Center Summary */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center p-2">
+                      <span className="text-[10px] uppercase tracking-wider font-extrabold text-zinc-400 font-rounded">
+                        Top Subject
+                      </span>
+                      <span className="text-sm sm:text-base font-extrabold text-zinc-950 font-display truncate max-w-[120px]">
+                        {analytics.subjectDistribution[0]?.subject || 'N/A'}
+                      </span>
+                      <span className="text-[11px] font-mono font-bold text-zinc-600">
+                        {analytics.subjectDistribution[0]?.percentage}% of time
+                      </span>
                     </div>
                   </div>
-                ))}
+                </div>
+
+                {/* Subject List & Progress Metrics */}
+                <div className="lg:col-span-6 space-y-3">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500 font-rounded mb-1">
+                    Subject Allocation Detail
+                  </h4>
+                  {analytics.subjectDistribution.map((sub, idx) => {
+                    const sliceColor = sub.color || DONUT_PALETTE[idx % DONUT_PALETTE.length];
+                    return (
+                      <div key={sub.subject} className="p-2.5 rounded-2xl bg-white/70 border border-zinc-200/80 space-y-1.5">
+                        <div className="flex justify-between text-xs font-bold font-rounded">
+                          <span className="flex items-center gap-2">
+                            <span
+                              className="w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs"
+                              style={{ backgroundColor: sliceColor }}
+                            />
+                            <span className="text-zinc-900 font-bold">{sub.subject}</span>
+                          </span>
+                          <span className="font-mono text-zinc-600">
+                            {sub.minutes}m ({sub.percentage}%) • {sub.sessions} sessions
+                          </span>
+                        </div>
+
+                        <div className="w-full h-2 bg-zinc-100 rounded-full overflow-hidden border border-zinc-200/60">
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${sub.percentage}%`,
+                              backgroundColor: sliceColor,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>

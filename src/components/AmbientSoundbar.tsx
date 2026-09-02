@@ -56,71 +56,83 @@ export const AmbientSoundbar: React.FC<AmbientSoundbarProps> = ({ soundMuted }) 
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto my-3 p-4 rounded-3xl bg-white border border-zinc-200/90 shadow-2xs select-none transition-all">
-      <div className="flex items-center justify-between gap-2 mb-3">
+    <div className="w-full max-w-lg mx-auto my-2 p-3 sm:p-3.5 rounded-2xl bg-white/85 backdrop-blur-xl border border-zinc-200/80 shadow-2xs select-none transition-all">
+      <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
-          <div className="w-2.5 h-2.5 rounded-full bg-zinc-950 flex items-center justify-center">
-            {activeSound && <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />}
-          </div>
-          <div>
-            <span className="text-xs font-extrabold text-zinc-950 font-display">
-              Ambient Focus Soundscape
+          <div className={`w-2 h-2 rounded-full ${activeSound ? 'bg-zinc-950 animate-ping' : 'bg-zinc-300'}`} />
+          <span className="text-xs font-extrabold text-zinc-900 font-display">
+            Ambient Focus Audio
+          </span>
+          {activeSound && (
+            <span className="px-2 py-0.2 rounded-full bg-zinc-100 text-zinc-900 text-[10px] font-bold font-rounded">
+              Playing
             </span>
-            <span className="text-[10px] text-zinc-600 block font-rounded">
-              {activeSound ? 'Audio loop synthesized natively' : 'Click a sound to begin audio block'}
-            </span>
-          </div>
+          )}
         </div>
 
-        {/* Volume Slider */}
+        {/* Volume & Stop Control */}
         <div className="flex items-center gap-2">
-          <span className="text-zinc-500">
-            {volume === 0 || soundMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-          </span>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.05"
-            value={volume}
-            onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-            className="w-16 sm:w-20 h-1.5 bg-zinc-200 rounded-full appearance-none cursor-pointer accent-zinc-950"
-            title="Ambient Volume"
-          />
-          <span className="text-[11px] font-mono font-bold text-zinc-600 w-7">
-            {Math.round(volume * 100)}%
-          </span>
+          {activeSound && (
+            <button
+              onClick={() => {
+                sound.stopAmbient();
+                setActiveSound(null);
+              }}
+              className="text-[10px] font-bold text-zinc-600 hover:text-zinc-950 px-2 py-0.5 rounded-full hover:bg-zinc-100 transition-colors font-rounded"
+            >
+              Stop
+            </button>
+          )}
+
+          <div className="flex items-center gap-1.5">
+            <span className="text-zinc-400">
+              {volume === 0 || soundMuted ? <VolumeX className="w-3 h-3 text-zinc-400" /> : <Volume2 className="w-3 h-3 text-zinc-800" />}
+            </span>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={volume}
+              onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+              className="w-14 sm:w-18 h-1 bg-zinc-200 rounded-full appearance-none cursor-pointer accent-zinc-950"
+              title="Ambient Volume"
+            />
+            <span className="text-[10px] font-mono font-semibold text-zinc-500 w-6">
+              {Math.round(volume * 100)}%
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Sound Options Buttons with rounded pill styling */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      {/* Sound Options Buttons with compact rounded pill styling */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
         {soundOptions.map((opt) => {
           const isSelected = activeSound === opt.id;
           return (
             <button
               key={opt.id}
               onClick={() => handleToggleSound(opt.id)}
-              className={`p-3 rounded-2xl border text-left transition-all duration-200 flex flex-col gap-1.5 active:scale-95 ${
+              className={`px-2.5 py-1.5 rounded-xl border text-left transition-all duration-200 flex items-center justify-between gap-1.5 active:scale-95 ${
                 isSelected
-                  ? 'bg-zinc-950 text-white border-zinc-950 shadow-xs'
-                  : 'bg-zinc-50/80 hover:bg-zinc-100 border-zinc-200/80 text-zinc-700'
+                  ? 'bg-zinc-950 text-white border-zinc-950 font-bold shadow-2xs'
+                  : 'bg-white/70 hover:bg-white border-zinc-200/70 text-zinc-700 hover:text-zinc-950'
               }`}
               title={opt.desc}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 min-w-0">
                 <span className={isSelected ? 'text-white' : 'text-zinc-500'}>
                   {opt.icon}
                 </span>
-                {isSelected && (
-                  <span className="flex gap-0.5 items-end h-3">
-                    <span className="w-1 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-1 h-3.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-1 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </span>
-                )}
+                <span className="text-[11px] font-bold font-rounded truncate">{opt.label}</span>
               </div>
-              <span className="text-xs font-bold font-rounded truncate">{opt.label}</span>
+              {isSelected && (
+                <span className="flex gap-0.5 items-end h-2.5 shrink-0">
+                  <span className="w-0.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-0.5 h-2.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-0.5 h-1 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                </span>
+              )}
             </button>
           );
         })}

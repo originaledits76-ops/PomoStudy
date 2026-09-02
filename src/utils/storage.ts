@@ -8,6 +8,7 @@ const STORAGE_KEYS = {
   STREAK: 'pomostudy_streak_v2',
   ACTIVE_TASK_ID: 'pomostudy_active_task_v2',
   POKI: 'pomostudy_poki_v2',
+  TOUR_SEEN: 'pomostudy_tour_seen_v1',
 };
 
 export const DEFAULT_POKI: PokiState = {
@@ -586,6 +587,23 @@ export const StorageService = {
     } catch (e) {
       console.error('Import failed', e);
       return false;
+    }
+  },
+
+  // --- Tour Guide Status ---
+  hasSeenTour(): boolean {
+    try {
+      return localStorage.getItem(STORAGE_KEYS.TOUR_SEEN) === 'true';
+    } catch {
+      return false;
+    }
+  },
+
+  setSeenTour(seen: boolean): void {
+    try {
+      localStorage.setItem(STORAGE_KEYS.TOUR_SEEN, seen ? 'true' : 'false');
+    } catch {
+      // ignore
     }
   },
 };
